@@ -1,0 +1,93 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Welcome to ABC Bank";
+}
+
+<!-- Welcome Message (if user just registered) -->
+@if (Model.UserFullName != null)
+{
+    <div class="text-center welcome-message">
+        <h1 class="display-4">Welcome @Model.UserFullName to the ABC Bank</h1>
+        <p>Your credit card registration is complete.</p>
+        @if (!string.IsNullOrEmpty(Model.UserFullName))
+        {
+            <a href="/CardDetails" class="btn btn-primary mt-2">Card Detail</a>
+        }
+    </div>
+}
+
+<!-- Carousel -->
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active" style="background-color: #007bff; height: 400px;">
+            <img src="https://www.pbebank.com/media/i5pjrfsf/03.jpg" alt="slide1">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>Secure Your Financial Future</h5>
+                <p>Register your credit card with ABC Bank today!</p>
+            </div>
+        </div>
+        <div class="carousel-item" style="background-color: #0056b3; height: 400px;">
+            <img src="https://www.pbebank.com/media/5t3nkwzc/02.jpg" alt="slide2">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>Fast & Easy Registration</h5>
+                <p>Complete in minutes with our secure system.</p>
+            </div>
+        </div>
+        <div class="carousel-item" style="background-color: #003d7a; height: 400px;">
+            <img src="https://www.pbebank.com/media/mbnh14m5/mainslider-9.jpg" alt="slide3">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>Trusted by Millions</h5>
+                <p>Join ABC Bank’s trusted customers worldwide.</p>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<!-- Card Types -->
+<div class="container mt-4">
+    <h3 class="text-center">Available Credit Cards</h3>
+    <div class="row">
+        @foreach (var cardType in Model.CardTypes)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">@cardType.CardTypeName</h5>
+                        <p class="card-text">@(cardType.Benefits ?? "Exclusive benefits for you!")</p>
+                        <form method="post">
+                            <input type="hidden" name="cardTypeId" value="@cardType.CardTypeID" />
+                            <button type="submit" asp-page-handler="SelectCardType" class="btn btn-primary">Register Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .welcome-message {
+        padding: 30px 0;
+        background-color: #e7f3ff;
+        border-bottom: 1px solid #ddd;
+    }
+
+        .welcome-message h1 {
+            color: #007bff;
+        }
+
+        .welcome-message p {
+            font-size: 1.1rem;
+            color: #555;
+        }
+</style>

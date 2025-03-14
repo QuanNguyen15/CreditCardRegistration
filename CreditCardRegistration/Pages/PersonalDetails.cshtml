@@ -1,0 +1,394 @@
+﻿@page
+@model CreditCardRegistration.Pages.PersonalDetailsModel
+@{
+    ViewData["Title"] = "Personal Details - Credit Card Registration";
+}
+
+<h2 class="text-center">Personal Details</h2>
+
+<div class="form-container">
+    <!-- Progress Indicator -->
+    <ul class="progress-steps">
+        <li class="">Step 1: Account Information</li>
+        <li class="">Step 2: Personal Information</li>
+        <li class="">Step 3: Upload Documents</li>
+        <li class="">Step 4: Additional Information</li>
+    </ul>
+
+    <form id="PersonalDetails" method="post" enctype="multipart/form-data" novalidate>
+        <!-- Step 1: Account Information -->
+        <div class="form-step" data-step="1">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            <h5>Account Information</h5>
+            <div class="form-group">
+                <label asp-for="Username">Username</label>
+                <input asp-for="Username" class="form-control" required data-val-required="Username is required." />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" type="password" class="form-control" required data-val-required="Password is required." />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Confirm Password</label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" required data-val-required="Confirm Password is required." />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn btn-primary next-step" data-step="1" data-next-step="2">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Personal Information -->
+        <div class="form-step" data-step="2" style="display:none">
+            <h5>Personal Information</h5>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="FullName">Full Name</label>
+                    <input asp-for="FullName" class="form-control" required data-val-required="Full Name is required." />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email">Email</label>
+                    <input asp-for="Email" type="email" class="form-control" required data-val-required="Email is required." data-val-email="Invalid email format." />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="PhonePrefix">Phone Prefix</label>
+                    <select asp-for="PhonePrefix" class="form-control" required>
+                        <option value="+84">+84 (VN)</option>
+                        <option value="+60">+60 (MA)</option>
+                    </select>
+                    <span asp-validation-for="PhonePrefix" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PhoneNumber">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="form-control" required
+                           data-val-required="Phone Number is required."
+                           data-val-length="Phone Number must be between 9 and 15 digits."
+                           data-val-length-min="9" data-val-length-max="15"
+                           data-val-regex="Phone Number must contain only digits."
+                           data-val-regex-pattern="^\d+$" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateOfBirth">Date of Birth</label>
+                <input asp-for="DateOfBirth" type="date" class="form-control" required data-val-required="Date of Birth is required." />
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IDNumber">ID Number (CMND/CCCD/Passport)</label>
+                <input asp-for="IDNumber" class="form-control" required data-val-required="ID Number is required." />
+                <span asp-validation-for="IDNumber" class="text-danger"></span>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary prev-step" data-prev-step="1">Previous</button>
+                <button type="button" class="btn btn-primary next-step" data-step="2" data-next-step="3">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Upload Verification Documents -->
+        <div class="form-step" data-step="3" style="display:none">
+            <h5>Upload Verification Documents</h5>
+            <div class="form-group">
+                <label for="FrontIDPhoto">Front ID Photo (CMND/CCCD/Passport)</label>
+                <input type="file" id="FrontIDPhoto" name="FrontIDPhoto" class="form-control" accept="image/*" required />
+                <span class="text-danger" data-valmsg-for="FrontIDPhoto" data-valmsg-replace="true"></span>
+            </div>
+            <div class="form-group">
+                <label for="BackIDPhoto">Back ID Photo (CMND/CCCD/Passport)</label>
+                <input type="file" id="BackIDPhoto" name="BackIDPhoto" class="form-control" accept="image/*" required />
+                <span class="text-danger" data-valmsg-for="BackIDPhoto" data-valmsg-replace="true"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DocumentUpload">Additional Identification Document</label>
+                <input asp-for="DocumentUpload" type="file" class="form-control" accept=".pdf,.jpg,.png" required />
+                <small class="form-text text-muted">Only PDF, JPG, or PNG files are allowed. Maximum size: 5MB.</small>
+                <span asp-validation-for="DocumentUpload" class="text-danger"></span>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary prev-step" data-prev-step="2">Previous</button>
+                <button type="button" class="btn btn-primary next-step" data-step="3" data-next-step="4">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Additional Information -->
+        <div class="form-step" data-step="4" style="display:none">
+            <h5>Additional Information</h5>
+            <div class="form-group">
+                <label asp-for="MonthlyIncome">Monthly Income (VNĐ)</label>
+                <div class="income-slider-container">
+                    <input type="range" asp-for="MonthlyIncome" class="form-control-range" min="0" max="100000000000" step="1000000" value="@Model.MonthlyIncome" />
+                    <span id="incomeValue" class="income-value">@Model.MonthlyIncome.ToString("N0") VNĐ</span>
+                </div>
+                <span asp-validation-for="MonthlyIncome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Occupation">Occupation</label>
+                <select asp-for="Occupation" class="form-control" required>
+                    <option value="">-- Select an occupation --</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Software Engineer">Software Engineer</option>
+                    <option value="Lecturer">Lecturer</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Freelancer">Freelancer</option>
+                    <option value="Student">Student</option>
+                    <option value="Others">Others</option>
+                </select>
+                <span asp-validation-for="Occupation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address">Address</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <input asp-for="TermsAgreed" type="checkbox" class="form-check-input" required
+                       data-val-required="You must agree to the terms and conditions."
+                       data-val-range="You must agree to the terms and conditions."
+                       data-val-range-min="true" data-val-range-max="true" value="true" />
+                <label asp-for="TermsAgreed" class="form-check-label">I agree to the <a href="#">terms and conditions</a>.</label>
+                <span asp-validation-for="TermsAgreed" class="text-danger"></span>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary prev-step" data-prev-step="3">Previous</button>
+                <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            console.log("PersonalDetails script loaded and running");
+
+            let initialStep = @(!HttpContext.Session.GetInt32("LoggedInUserID").HasValue ? 1 : 2);
+            console.log("Initial step: ", initialStep);
+
+            function setupPersonalDetailsValidation() {
+                $("#PersonalDetails").validate({
+                    invalidHandler: function (event, validator) {
+                        console.log("PersonalDetails form validation failed: ", validator.numberOfInvalids(), " invalid fields");
+                    },
+                    submitHandler: function (form) {
+                        console.log("PersonalDetails form validation passed, submitting form");
+                        form.submit();
+                    }
+                });
+            }
+
+            function nextStep(step) {
+                $(".form-step").hide();
+                $(`[data-step="${step}"]`).show();
+                updateProgress(step);
+            }
+
+            function prevStep(step) {
+                $(".form-step").hide();
+                $(`[data-step="${step}"]`).show();
+                updateProgress(step);
+            }
+
+            function updateProgress(currentStep) {
+                $(".progress-steps li").removeClass("active");
+                $(".progress-steps li").each(function (index) {
+                    if (index < currentStep - 1) $(this).addClass("active");
+                });
+            }
+
+            $(".next-step").on("click", function () {
+                let currentStep = $(this).data("step");
+                let nextStepNum = $(this).data("next-step");
+
+                let formData = new FormData($("#PersonalDetails")[0]);
+                $.ajax({
+                    url: `/PersonalDetails?handler=Step${currentStep}`,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN", $('input[name="__RequestVerificationToken"]').val());
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            nextStep(nextStepNum);
+                        } else if (response.errors) {
+                            alert("Please correct the following errors:\n" + response.errors.join("\n"));
+                        } else {
+                            alert("An unexpected error occurred.");
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Error in step " + currentStep + ": ", xhr.responseText);
+                        alert("An error occurred. Please try again.");
+                    }
+                });
+            });
+
+            $(".prev-step").on("click", function () {
+                let prevStep = $(this).data("prev-step");
+                prevStep(prevStep);
+            });
+
+            $("#submitButton").on("click", function (e) {
+                e.preventDefault();
+                let formData = new FormData($("#PersonalDetails")[0]);
+                $.ajax({
+                    url: `/PersonalDetails`,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN", $('input[name="__RequestVerificationToken"]').val());
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = "/Index"; // Điều hướng thủ công khi thành công
+                        } else if (response.errors) {
+                            alert("Please correct the following errors:\n" + response.errors.join("\n"));
+                        } else {
+                            alert("An unexpected error occurred.");
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error("Error on submit: ", xhr.responseText);
+                        alert("An error occurred. Please try again.");
+                    }
+                });
+            });
+
+            // Thêm sự kiện cho thanh kéo MonthlyIncome
+            $(".form-control-range").on("input", function () {
+                let value = $(this).val();
+                $("#incomeValue").text((value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " VNĐ");
+                $("#MonthlyIncome").val(value); // Cập nhật giá trị hidden input nếu cần
+            });
+
+            nextStep(initialStep);
+            setupPersonalDetailsValidation();
+        });
+    </script>
+}
+
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+        .progress-steps li {
+            padding: 10px;
+            color: #6c757d;
+            cursor: default;
+        }
+
+            .progress-steps li.active {
+                color: #007bff;
+                font-weight: bold;
+                border-bottom: 2px solid #007bff;
+            }
+
+    .form-step {
+        display: none;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .btn-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .btn {
+        margin: 0 5px;
+    }
+
+    h5 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .income-slider-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-control-range {
+        width: 70%;
+        margin-right: 10px;
+    }
+
+    .income-value {
+        font-size: 1rem;
+        padding: 5px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+    @@media (max-width: 767px) {
+        .form-row
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .income-slider-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-control-range {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    }
+</style>

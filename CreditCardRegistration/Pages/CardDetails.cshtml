@@ -1,0 +1,512 @@
+﻿@page
+@model CreditCardRegistration.Pages.CardDetailsModel
+
+@{
+    ViewData["Title"] = "Card Details - Credit Card Registration";
+}
+
+<h2 class="text-center mb-4">Your Credit Cards</h2>
+
+<div class="container">
+    <h4 class="text-center">Hello, @Model.User.FullName!</h4>
+
+    <!-- Under Development Modal -->
+    <div class="modal fade" id="underDevelopmentModal" tabindex="-1" aria-labelledby="underDevelopmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="underDevelopmentModalLabel">Feature Under Development</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Feature under development. Please check back later!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Details Modal -->
+    <div class="modal fade" id="cardDetailsModal" tabindex="-1" aria-labelledby="cardDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cardDetailsModalLabel">Card Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="cardDetailsContent">
+                    <!-- Content will be dynamically inserted -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Popup (Bottom Left) -->
+    <div class="warning-popup" id="warningPopup">
+        <div class="alert alert-warning" role="alert">
+            To avoid any risk to your money and card information.<br><strong>Please do not provide your card number and CVV number to anyone.</strong>
+        </div>
+    </div>
+
+    <!-- Countdown Popup (Bottom Right) -->
+    <div class="countdown-popup" id="countdownPopup">
+        <div class="alert alert-info" role="alert">
+            <div id="countdown">
+                The display information will turn off after <span id="timer">120</span> seconds.
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline Notification -->
+    @{
+        if (!string.IsNullOrEmpty(Model.CardRegistrationTime))
+        {
+            var registrationTime = DateTime.Parse(Model.CardRegistrationTime);
+            var timeSinceRegistration = DateTime.Now - registrationTime;
+            if (timeSinceRegistration.TotalMinutes < 5)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    Your card will be activated after 5 minutes.
+                </div>
+            }
+        }
+    }
+
+    @if (!Model.CreditCards.Any())
+    {
+        <p class="text-center">You have not registered any credit cards yet. <a href="/PersonalDetails">Register a new card</a>.</p>
+    }
+    else
+    {
+        @foreach (var card in Model.CreditCards)
+        {
+            <div class="card-container">
+                <div class="row align-items-center">
+                    <!-- Card Template -->
+                    <div class="col-md-6 d-flex justify-content-center mb-3">
+                        <div class="credit-card">
+                            <div class="card-front">
+                                <div class="card-header">
+                                    <div class="bank-info">
+                                        <div class="bank-name">ABC Bank</div>
+                                        <div class="header-row">
+                                            <div class="user-name">@Model.User.FullName</div>
+                                            <div class="card-type">@card.CardType.CardTypeName</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-number">
+                                    <span class="masked-card-number">@Model.MaskCardNumber(card.CardNumber)</span>
+                                </div>
+                                <div class="card-details">
+                                    <div class="card-cvv">
+                                        CVV: <span class="sensitive-data" data-type="cvv" data-value="@card.CVV">@card.CVV</span>
+                                    </div>
+                                    <div class="card-expiry">
+                                        Valid Thru: <span class="sensitive-data" data-type="expiry-date" data-value="@card.ExpiryDate">@card.ExpiryDate</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card Services -->
+                    <div class="col-md-6">
+                        <div class="card-services text-center">
+                            <h5 class="mb-3">Card Services</h5>
+                            <div class="service-buttons">
+                                <!-- Primary Actions -->
+                                <div class="service-row">
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#cardDetailsModal" data-card-id="@card.CreditCardID">
+                                        <i class="bi bi-info-circle"></i> View Card Details
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#underDevelopmentModal">
+                                        <i class="bi bi-lock"></i> Lock Card
+                                    </button>
+                                </div>
+                                <!-- Secondary Actions -->
+                                <div class="service-row">
+                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#underDevelopmentModal">
+                                        <i class="bi bi-clock-history"></i> View Transaction History
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#underDevelopmentModal">
+                                        <i class="bi bi-printer"></i> Print Physical Card
+                                    </button>
+                                </div>
+                                <!-- Back Button -->
+                                <div class="service-row">
+                                    <a href="/" class="btn btn-secondary btn-sm">Back to Card Homepage</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Pass CreditCards data to JavaScript
+            const creditCards = @Html.Raw(Json.Serialize(Model.CreditCards));
+
+            // Set timeout duration (120 seconds)
+            const TIMEOUT_SECONDS = 120;
+            let timeRemaining = TIMEOUT_SECONDS;
+
+            // Update timer display and redirect to Index after timeout
+            function updateTimer() {
+                $('#timer').text(timeRemaining);
+                timeRemaining--;
+
+                if (timeRemaining < 0) {
+                    window.location.href = '/';
+                }
+            }
+
+            // Start countdown and show popups
+            $('#warningPopup').addClass('show');
+            $('#countdownPopup').addClass('show');
+            updateTimer(); // Initial display
+            const timerInterval = setInterval(updateTimer, 1000);
+
+            // Hide warning popup when "Đã hiểu" is clicked
+            $('#closeWarning').on('click', function () {
+                $('#warningPopup').removeClass('show');
+            });
+
+            // Handle copy functionality
+            $('.copy-icon').on('click', function () {
+                const valueToCopy = $(this).data('copy');
+                navigator.clipboard.writeText(valueToCopy).then(() => {
+                    alert('Copied to clipboard: ' + valueToCopy);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            });
+
+            // Populate card details in modal
+            $('button[data-card-id]').on('click', function () {
+                const cardId = $(this).data('card-id');
+                const card = creditCards.find(c => c.creditCardID === cardId);
+                if (card) {
+                    const detailsHtml = `
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td class="text-left"><strong>Card Type:</strong></td>
+                                    <td class="text-right">${card.cardType.cardTypeName}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Card Number:</strong></td>
+                                    <td class="text-right">
+                                        <span class="sensitive-data" data-type="card-number" data-value="${card.cardNumber}">${card.cardNumber}</span>
+                                        <i class="bi bi-clipboard copy-icon" data-copy="${card.cardNumber}" title="Copy"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Expiry Date:</strong></td>
+                                    <td class="text-right">
+                                        <span class="sensitive-data" data-type="expiry-date" data-value="${card.expiryDate}">${card.expiryDate}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>CVV:</strong></td>
+                                    <td class="text-right">
+                                        <span class="sensitive-data" data-type="cvv" data-value="${card.cvv}">${card.cvv}</span>
+                                        <i class="bi bi-clipboard copy-icon" data-copy="${card.cvv}" title="Copy"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Status:</strong></td>
+                                    <td class="text-right">${card.status}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-left"><strong>Created Date:</strong></td>
+                                    <td class="text-right">${new Date(card.createdDate).toLocaleDateString('en-GB')}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    $('#cardDetailsContent').html(detailsHtml);
+                }
+            });
+
+            // Update card status via AJAX every minute
+            function checkAndUpdateCardStatus() {
+                fetch('/CardDetails/UpdateCardStatus', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.updated) {
+                            location.reload();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error updating card status: ', err);
+                    });
+            }
+
+            setInterval(checkAndUpdateCardStatus, 60 * 1000);
+            checkAndUpdateCardStatus();
+        });
+    </script>
+}
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .credit-card {
+        width: 340px;
+        height: 214px;
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-front {
+        padding: 20px;
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    .bank-info {
+        width: 100%;
+    }
+
+    .bank-name {
+        font-family: 'Arial', sans-serif;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
+    }
+
+    .user-name {
+        font-family: 'Arial', sans-serif;
+        font-size: 14px;
+    }
+
+    .card-type {
+        font-family: 'Arial', sans-serif;
+        font-size: 14px;
+        font-style: italic;
+    }
+
+    .card-number {
+        font-family: 'Arial', sans-serif;
+        font-size: 24px;
+        letter-spacing: 2px;
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    .card-details {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'Arial', sans-serif;
+        font-size: 16px;
+    }
+
+    .card-cvv {
+        font-weight: bold;
+    }
+
+    .card-expiry {
+        font-weight: bold;
+    }
+
+    .card-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .card-services {
+        padding: 15px;
+    }
+
+    .service-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .service-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+        .service-row .btn, .service-row a.btn {
+            flex: 1;
+            max-width: 180px; /* Đặt chiều rộng cố định cho các nút */
+            font-size: 14px;
+            padding: 8px 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+        }
+
+            .service-row .btn:hover, .service-row a.btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+        .service-row:last-child .btn {
+            max-width: 360px; 
+        }
+
+    .table-borderless td {
+        border: none;
+        padding: 5px 10px;
+    }
+
+    .text-left {
+        text-align: left !important;
+    }
+
+    .text-right {
+        text-align: right !important;
+    }
+
+    .copy-icon {
+        cursor: pointer;
+        margin-left: 10px;
+        color: #007bff;
+        font-size: 16px;
+    }
+
+        .copy-icon:hover {
+            color: #0056b3;
+        }
+
+    .warning-popup {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1050;
+        display: none;
+        max-width: 350px;
+    }
+
+    .countdown-popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1050;
+        display: none;
+        max-width: 350px;
+    }
+
+        .warning-popup.show, .countdown-popup.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    #countdown {
+        font-size: 1.1rem;
+        color: #ff0000;
+        margin-top: 10px;
+    }
+
+    #timer {
+        font-weight: bold;
+    }
+
+    @@media (max-width: 767px) {
+        .credit-card
+
+    {
+        width: 280px;
+        height: 176px;
+    }
+
+    .card-number {
+        font-size: 20px;
+        margin-top: 30px;
+    }
+
+    .card-details {
+        font-size: 14px;
+    }
+
+    .bank-name {
+        font-size: 16px;
+    }
+
+    .user-name, .card-type {
+        font-size: 12px;
+    }
+
+    .service-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .service-row .btn, .service-row a.btn {
+            max-width: 100%; /* Trên mobile, nút chiếm toàn bộ chiều rộng */
+        }
+
+        .service-row:last-child .btn {
+            max-width: 100%; /* Nút "Back to Card Homepage" cũng chiếm toàn bộ chiều rộng trên mobile */
+        }
+
+    .warning-popup, .countdown-popup {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    .countdown-popup {
+        margin-top: 60px; /* Đảm bảo không chồng lên warning-popup trên mobile */
+    }
+
+    }
+</style>
